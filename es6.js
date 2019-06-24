@@ -233,3 +233,28 @@ for (const [key, value] of Object.entries(a)) {
   console.log(key);
   console.log(value);
 }
+
+const a = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    reject("resolve Promise a");
+  }, 300);
+});
+
+const b = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    reject("resolve Promise b");
+  }, 200);
+});
+
+const c = Promise.all([a, b]);
+
+const test = async () => {
+  try {
+    const data = await c;
+    console.log(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+console.log(test());
