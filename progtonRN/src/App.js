@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Button, SafeAreaView, Modal, TouchableWithoutFeedback } from 'react-native';
+import { Button, SafeAreaView, Modal, TouchableWithoutFeedback, Text } from 'react-native';
 import * as Yup from 'yup';
-import { TextBox } from 'components';
+import Config from 'react-native-config';
+import { TextBox, Select } from 'components';
 import Courses from './screen/courses/courses';
 import Close from './assets/icons/close.svg';
 import Form from './Form';
@@ -13,29 +14,6 @@ const validationSchema = Yup.object().shape({
   watchHref: Yup.string().required('Required'),
 });
 
-const formData = [
-  {
-    name: 'title',
-    component: TextBox,
-    placeholder: 'Enter Title',
-  },
-  {
-    name: 'length',
-    component: TextBox,
-    placeholder: 'Enter length',
-  },
-  {
-    name: 'category',
-    component: TextBox,
-    placeholder: 'Enter category',
-  },
-  {
-    name: 'watchHref',
-    component: TextBox,
-    placeholder: 'Enter watchHref',
-  },
-];
-
 export default class App extends Component {
   state = {
     open: false,
@@ -46,6 +24,62 @@ export default class App extends Component {
       watchHref: '',
       authorId: '',
     },
+    courses: [],
+    authors: [],
+    error: false,
+    formData: null,
+  };
+
+  async componentDidMount() {
+    await this.fetchData();
+
+    const { authors } = this.state;
+
+    const items = authors.map(x => ({ label: `${x.firstName} ${x.lastName}`, value: x.id }));
+
+    const formData = [
+      {
+        name: 'title',
+        component: TextBox,
+        placeholder: 'Enter Title',
+      },
+      {
+        name: 'length',
+        component: TextBox,
+        placeholder: 'Enter length',
+      },
+      {
+        name: 'category',
+        component: TextBox,
+        placeholder: 'Enter category',
+      },
+      {
+        name: 'watchHref',
+        component: TextBox,
+        placeholder: 'Enter watchHref',
+      },
+      {
+        name: 'authorId',
+        component: Select,
+        items,
+        placeholder: 'Select Author',
+      },
+    ];
+
+    this.setState({ formData });
+  }
+
+  fetchData = async () => {
+    try {
+      const res = await Promise.all([
+        fetch(`${Config.API_URL}courses`),
+        fetch(`${Config.API_URL}authors`),
+      ]);
+      const data = await Promise.all([res[0].json(), res[1].json()]);
+      this.setState({ courses: data[0], authors: data[1] });
+    } catch (error) {
+      this.setState({ error });
+    }
   };
 
   toggleModal = () => {
@@ -59,22 +93,27 @@ export default class App extends Component {
   };
 
   render() {
-    const { open, form } = this.state;
+    const { open, form, courses, authors, error, formData } = this.state;
+    if (error) {
+      return <Text>{error.message}</Text>;
+    }
     return (
       <SafeAreaView>
         <Button title="Add Course" onPress={this.toggleModal} />
-        <Courses />
+        <Courses courses={courses} authors={authors} />
         <Modal animated visible={open}>
           <SafeAreaView style={{ flex: 1 }}>
             <TouchableWithoutFeedback onPress={this.toggleModal}>
               <Close width={24} height={24} />
             </TouchableWithoutFeedback>
-            <Form
-              initialValues={form}
-              onSubmit={this.onSubmit}
-              validationSchema={validationSchema}
-              formData={formData}
-            />
+            {formData && (
+              <Form
+                initialValues={form}
+                onSubmit={this.onSubmit}
+                validationSchema={validationSchema}
+                formData={formData}
+              />
+            )}
           </SafeAreaView>
         </Modal>
       </SafeAreaView>

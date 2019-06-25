@@ -4,7 +4,12 @@ import { TextInput, View, Text } from 'react-native';
 
 const TextBox = ({ field, form: { touched, errors, handleChange, handleBlur }, ...props }) => (
   <View>
-    <TextInput onChangeText={handleChange(field.name)} onBlur={handleBlur(field.name)} {...props} />
+    <TextInput
+      onChangeText={handleChange(field.name)}
+      onBlur={handleBlur(field.name)}
+      {...field}
+      {...props}
+    />
     {touched[field.name] && errors[field.name] && (
       <Text className="error">{errors[field.name]}</Text>
     )}

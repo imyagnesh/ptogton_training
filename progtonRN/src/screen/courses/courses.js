@@ -1,33 +1,16 @@
 import React, { PureComponent } from 'react';
-// import PropTypes from 'prop-types';
-import Config from 'react-native-config';
+import PropTypes from 'prop-types';
 import { ListItem } from 'components';
-import { Text, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
 
 export default class coursesPage extends PureComponent {
-  static propTypes = {};
-
-  state = { courses: [], authors: [], error: false };
-
-  componentDidMount() {
-    this.fetchData();
-  }
-
-  fetchData = async () => {
-    try {
-      const res = await Promise.all([
-        fetch(`${Config.API_URL}courses`),
-        fetch(`${Config.API_URL}authors`),
-      ]);
-      const data = await Promise.all([res[0].json(), res[1].json()]);
-      this.setState({ courses: data[0], authors: data[1] });
-    } catch (error) {
-      this.setState({ error });
-    }
+  static propTypes = {
+    authors: PropTypes.array.isRequired,
+    courses: PropTypes.array.isRequired,
   };
 
   renderAuthor = id => {
-    const { authors } = this.state;
+    const { authors } = this.props;
 
     const author = authors.find(x => x.id === id);
     if (author) {
@@ -37,11 +20,8 @@ export default class coursesPage extends PureComponent {
   };
 
   render() {
-    const { courses, error } = this.state;
+    const { courses } = this.props;
 
-    if (error) {
-      return <Text>{error.message}</Text>;
-    }
     return (
       <ScrollView>
         {courses.map(x => (
