@@ -1,0 +1,12 @@
+{
+  "name": "components",
+  "version": "1.0.0",
+  "description": "re-usable components",
+  "main": "index.js",
+  "author": "yagnesh modh",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "16.8.3",
+    "react-native": "0.59.9"
+  }
+}

@@ -1,0 +1,39 @@
+{
+    "todos": [
+        {
+            "id": 1,
+            "text": "get milk",
+            "isDone": false
+        }
+    ],
+    "courses": [
+        {
+            "title": "title",
+            "courseURL": "",
+            "length": "5:08",
+            "category": "react",
+            "country": "",
+            "state": "",
+            "watchHref": "http://www.pluralsight com/courses/react-flux-building-applications",
+            "authorId": "dan-wahlin",
+            "id": "SmZG8VX"
+        }
+    ],
+    "authors": [
+        {
+            "id": "cory-house",
+            "firstName": "Cory",
+            "lastName": "House"
+        },
+        {
+            "id": "scott-allen",
+            "firstName": "Scott",
+            "lastName": "Allen"
+        },
+        {
+            "id": "dan-wahlin",
+            "firstName": "Dan",
+            "lastName": "Wahlin"
+        }
+    ]
+}
