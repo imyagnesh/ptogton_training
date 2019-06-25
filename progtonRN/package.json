@@ -11,10 +11,13 @@
   },
   "dependencies": {
     "components": "file:./components",
+    "formik": "^1.5.7",
     "prop-types": "^15.7.2",
     "react": "16.8.3",
     "react-native": "0.59.9",
-    "react-native-config": "^0.11.7"
+    "react-native-config": "^0.11.7",
+    "react-native-svg": "^9.5.1",
+    "yup": "^0.27.0"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
@@ -35,6 +38,7 @@
     "jest": "^24.8.0",
     "metro-react-native-babel-preset": "^0.54.1",
     "prettier": "^1.18.2",
+    "react-native-svg-transformer": "^0.13.0",
     "react-test-renderer": "16.8.3"
   },
   "jest": {

@@ -9,11 +9,8 @@
     "courses": [
         {
             "title": "title",
-            "courseURL": "",
             "length": "5:08",
             "category": "react",
-            "country": "",
-            "state": "",
             "watchHref": "http://www.pluralsight com/courses/react-flux-building-applications",
             "authorId": "dan-wahlin",
             "id": "SmZG8VX"

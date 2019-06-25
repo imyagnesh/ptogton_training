@@ -1,60 +1,53 @@
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import { Text, Button, SafeAreaView } from 'react-native';
+// import PropTypes from 'prop-types';
+import Config from 'react-native-config';
+import { ListItem } from 'components';
+import { Text, ScrollView } from 'react-native';
 
-export default class courses extends PureComponent {
-  static propTypes = {
-    test: PropTypes.string.isRequired,
+export default class coursesPage extends PureComponent {
+  static propTypes = {};
+
+  state = { courses: [], authors: [], error: false };
+
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  fetchData = async () => {
+    try {
+      const res = await Promise.all([
+        fetch(`${Config.API_URL}courses`),
+        fetch(`${Config.API_URL}authors`),
+      ]);
+      const data = await Promise.all([res[0].json(), res[1].json()]);
+      this.setState({ courses: data[0], authors: data[1] });
+    } catch (error) {
+      this.setState({ error });
+    }
   };
 
-  constructor(props) {
-    super(props);
-    console.warn(props);
-    this.state = {
-      test: '',
-    };
-  }
+  renderAuthor = id => {
+    const { authors } = this.state;
 
-  static getDerivedStateFromProps(props) {
-    return {
-      abc: 'abc',
-      test: props.test,
-    };
-  }
-
-  componentDidMount() {}
-
-  //   shouldComponentUpdate(nextProps, nextState, nextContext) {
-  //     const { test } = this.props;
-  //     if (test !== nextProps.test) {
-  //       return true;
-  //     }
-  //     return false;
-  //   }
-
-  //   getSnapshotBeforeUpdate(prevProps, prevState) {}
-
-  //   componentDidUpdate(prevProps, prevState) {
-
-  //   }
-
-  componentWillUnmount() {}
+    const author = authors.find(x => x.id === id);
+    if (author) {
+      return `${author.firstName} ${author.lastName}`;
+    }
+    return '';
+  };
 
   render() {
-    console.log(this.props);
-    const { test: propsTest } = this.props;
-    const { test: stateTest } = this.state;
-    console.warn('propsTest', propsTest);
-    console.warn('stateTest', stateTest);
+    const { courses, error } = this.state;
+
+    if (error) {
+      return <Text>{error.message}</Text>;
+    }
     return (
-      <SafeAreaView>
-        <Text> textInComponent </Text>
-        <Button
-          style={{ marginTop: 200 }}
-          title="Click Me"
-          onPress={() => this.setState({ test: 'test me' })}
-        />
-      </SafeAreaView>
+      <ScrollView>
+        {courses.map(x => (
+          <ListItem key={x.id} author={this.renderAuthor(x.authorId)} {...x} />
+        ))}
+      </ScrollView>
     );
   }
 }
