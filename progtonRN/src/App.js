@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Button, SafeAreaView, Modal, TouchableWithoutFeedback, Text } from 'react-native';
+import { Provider } from 'react-redux';
 import * as Yup from 'yup';
 import Config from 'react-native-config';
 import { TextBox, Select } from 'components';
@@ -7,6 +8,8 @@ import Courses from './screen/courses/courses';
 import Close from './assets/icons/close.svg';
 import Form from './Form';
 import { API } from './utils';
+import { LocaleProvider } from './context/localeContext';
+import store from './configureStore';
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required('Required'),
@@ -30,6 +33,8 @@ export default class App extends Component {
     authors: [],
     error: false,
     formData: null,
+    locale: 'en',
+    changeLocale: val => this.changeLocale(val),
   };
 
   async componentDidMount() {
@@ -70,6 +75,11 @@ export default class App extends Component {
 
     this.setState({ formData });
   }
+
+  changeLocale = val => {
+    console.warn(val);
+    this.setState({ locale: val ? 'en' : 'es' });
+  };
 
   fetchData = async () => {
     try {
@@ -130,30 +140,34 @@ export default class App extends Component {
   };
 
   render() {
-    const { open, form, courses, authors, error, formData } = this.state;
+    const { open, form, courses, authors, error, formData, locale, changeLocale } = this.state;
     if (error) {
       return <Text>{error.message}</Text>;
     }
     return (
-      <SafeAreaView>
-        <Button title="Add Course" onPress={this.onAddCourse} />
-        <Courses courses={courses} authors={authors} onEdit={this.onEdit} />
-        <Modal animated visible={open}>
-          <SafeAreaView style={{ flex: 1 }}>
-            <TouchableWithoutFeedback onPress={this.toggleModal}>
-              <Close width={24} height={24} />
-            </TouchableWithoutFeedback>
-            {formData && (
-              <Form
-                initialValues={form}
-                onSubmit={this.onSubmit}
-                validationSchema={validationSchema}
-                formData={formData}
-              />
-            )}
+      <Provider store={store}>
+        <LocaleProvider value={{ locale, changeLocale }}>
+          <SafeAreaView>
+            <Button title="Add Course" onPress={this.onAddCourse} />
+            <Courses courses={courses} authors={authors} onEdit={this.onEdit} />
+            <Modal animated visible={open}>
+              <SafeAreaView style={{ flex: 1 }}>
+                <TouchableWithoutFeedback onPress={this.toggleModal}>
+                  <Close width={24} height={24} />
+                </TouchableWithoutFeedback>
+                {formData && (
+                  <Form
+                    initialValues={form}
+                    onSubmit={this.onSubmit}
+                    validationSchema={validationSchema}
+                    formData={formData}
+                  />
+                )}
+              </SafeAreaView>
+            </Modal>
           </SafeAreaView>
-        </Modal>
-      </SafeAreaView>
+        </LocaleProvider>
+      </Provider>
     );
   }
 }

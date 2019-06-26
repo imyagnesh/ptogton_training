@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import React, { memo } from 'react';
-import { View, Text, ViewPropTypes } from 'react-native';
+import { View, Text, ViewPropTypes, Switch } from 'react-native';
 import cs from '../commonStyles';
 
 const renderObject = props => {
@@ -15,8 +15,20 @@ const renderObject = props => {
   return data;
 };
 
-const index = ({ id, authorId, ...props }) => {
-  return <View style={[cs.container, cs.shadow]}>{renderObject(props)}</View>;
+const index = ({ id, authorId, value, changeLocale, ...props }) => {
+  console.warn('value', value);
+  return (
+    <View style={[cs.container, cs.shadow]}>
+      <Switch
+        value={value}
+        onValueChange={val => {
+          changeLocale(val);
+        }}
+      />
+      <Text>{value ? 'en' : 'es'}</Text>
+      {renderObject(props)}
+    </View>
+  );
 };
 
 index.propTypes = {};
