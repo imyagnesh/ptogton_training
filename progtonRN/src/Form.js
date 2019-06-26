@@ -7,14 +7,19 @@ import { Formik, Field } from 'formik';
 const Form = ({ formData, ...props }) => {
   return (
     <Formik {...props}>
-      {({ handleSubmit }) => {
+      {({ handleSubmit, isSubmitting, errors }) => {
         return (
           <View style={{ flex: 1 }}>
             <Text>Add Course</Text>
+            {errors.general && <Text>{errors.general}</Text>}
             {formData.map(x => (
               <Field key={x.name} {...x} />
             ))}
-            <Button onPress={handleSubmit} title="Submit" />
+            <Button
+              disabled={isSubmitting}
+              onPress={handleSubmit}
+              title={isSubmitting ? 'Adding Course...' : 'Add Course'}
+            />
           </View>
         );
       }}

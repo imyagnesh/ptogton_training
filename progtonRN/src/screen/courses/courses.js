@@ -1,12 +1,13 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { ListItem } from 'components';
-import { ScrollView } from 'react-native';
+import { ScrollView, TouchableWithoutFeedback, View } from 'react-native';
 
 export default class coursesPage extends PureComponent {
   static propTypes = {
     authors: PropTypes.array.isRequired,
     courses: PropTypes.array.isRequired,
+    onEdit: PropTypes.func.isRequired,
   };
 
   renderAuthor = id => {
@@ -20,12 +21,16 @@ export default class coursesPage extends PureComponent {
   };
 
   render() {
-    const { courses } = this.props;
+    const { courses, onEdit } = this.props;
 
     return (
       <ScrollView>
         {courses.map(x => (
-          <ListItem key={x.id} author={this.renderAuthor(x.authorId)} {...x} />
+          <TouchableWithoutFeedback key={x.id} onPress={() => onEdit(x)}>
+            <View>
+              <ListItem author={this.renderAuthor(x.authorId)} {...x} />
+            </View>
+          </TouchableWithoutFeedback>
         ))}
       </ScrollView>
     );

@@ -1,36 +1,60 @@
 {
-    "todos": [
-        {
-            "id": 1,
-            "text": "get milk",
-            "isDone": false
-        }
-    ],
-    "courses": [
-        {
-            "title": "title",
-            "length": "5:08",
-            "category": "react",
-            "watchHref": "http://www.pluralsight com/courses/react-flux-building-applications",
-            "authorId": "dan-wahlin",
-            "id": "SmZG8VX"
-        }
-    ],
-    "authors": [
-        {
-            "id": "cory-house",
-            "firstName": "Cory",
-            "lastName": "House"
-        },
-        {
-            "id": "scott-allen",
-            "firstName": "Scott",
-            "lastName": "Allen"
-        },
-        {
-            "id": "dan-wahlin",
-            "firstName": "Dan",
-            "lastName": "Wahlin"
-        }
-    ]
+  "todos": [
+    {
+      "id": 1,
+      "text": "get milk",
+      "isDone": false
+    }
+  ],
+  "courses": [
+    {
+      "title": "title",
+      "length": "5:10",
+      "category": "react",
+      "watchHref": "http://www.pluralsight com/courses/react-flux-building-applications",
+      "authorId": "dan-wahlin",
+      "id": "SmZG8VX"
+    },
+    {
+      "title": "New title",
+      "length": "3:05",
+      "category": "Training",
+      "watchHref": "www.google.com",
+      "authorId": "scott-allen",
+      "id": "2ElYM6D"
+    },
+    {
+      "title": "Title 1",
+      "length": "3:50",
+      "category": "React",
+      "watchHref": "Www.reactjs.org",
+      "authorId": "cory-house",
+      "id": "OfJ8Rjj"
+    },
+    {
+      "title": "Title 2",
+      "length": "2:90",
+      "category": "React native",
+      "watchHref": "Www.reactnative.org",
+      "authorId": "scott-allen",
+      "id": "cfMR3Nk"
+    }
+  ],
+  "authors": [
+    {
+      "id": "cory-house",
+      "firstName": "Cory",
+      "lastName": "House"
+    },
+    {
+      "id": "scott-allen",
+      "firstName": "Scott",
+      "lastName": "Allen"
+    },
+    {
+      "id": "dan-wahlin",
+      "firstName": "Dan",
+      "lastName": "Wahlin"
+    }
+  ]
 }

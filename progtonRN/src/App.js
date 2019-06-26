@@ -6,6 +6,7 @@ import { TextBox, Select } from 'components';
 import Courses from './screen/courses/courses';
 import Close from './assets/icons/close.svg';
 import Form from './Form';
+import { API } from './utils';
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required('Required'),
@@ -14,16 +15,17 @@ const validationSchema = Yup.object().shape({
   watchHref: Yup.string().required('Required'),
 });
 
+const initialValues = {
+  title: '',
+  length: '',
+  category: '',
+  watchHref: '',
+  authorId: '',
+};
 export default class App extends Component {
   state = {
     open: false,
-    form: {
-      title: '',
-      length: '',
-      category: '',
-      watchHref: '',
-      authorId: '',
-    },
+    form: initialValues,
     courses: [],
     authors: [],
     error: false,
@@ -72,11 +74,10 @@ export default class App extends Component {
   fetchData = async () => {
     try {
       const res = await Promise.all([
-        fetch(`${Config.API_URL}courses`),
-        fetch(`${Config.API_URL}authors`),
+        API({ url: `${Config.API_URL}courses` }),
+        API({ url: `${Config.API_URL}authors` }),
       ]);
-      const data = await Promise.all([res[0].json(), res[1].json()]);
-      this.setState({ courses: data[0], authors: data[1] });
+      this.setState({ courses: res[0], authors: res[1] });
     } catch (error) {
       this.setState({ error });
     }
@@ -88,8 +89,44 @@ export default class App extends Component {
     });
   };
 
-  onSubmit = values => {
-    console.warn('values', values);
+  onSubmit = async (values, actions) => {
+    try {
+      let url = 'http://localhost:3004/courses';
+      if (values.id) {
+        url = `http://localhost:3004/courses/${values.id}`;
+      }
+
+      const course = await API({ url, method: values.id ? 'PUT' : 'POST', body: values });
+      if (values.id) {
+        this.setState(state => {
+          const { courses } = this.state;
+          const index = courses.findIndex(x => x.id === values.id);
+          return {
+            courses: [...state.courses.slice(0, index), course, ...state.courses.slice(index + 1)],
+          };
+        });
+      } else {
+        this.setState(state => {
+          return { courses: [...state.courses, course] };
+        });
+      }
+      this.toggleModal();
+      actions.resetForm();
+    } catch (error) {
+      actions.setErrors({ general: error.message });
+    } finally {
+      actions.setSubmitting(false);
+    }
+  };
+
+  onEdit = form => {
+    this.setState({ form });
+    this.toggleModal();
+  };
+
+  onAddCourse = () => {
+    this.setState({ form: initialValues });
+    this.toggleModal();
   };
 
   render() {
@@ -99,8 +136,8 @@ export default class App extends Component {
     }
     return (
       <SafeAreaView>
-        <Button title="Add Course" onPress={this.toggleModal} />
-        <Courses courses={courses} authors={authors} />
+        <Button title="Add Course" onPress={this.onAddCourse} />
+        <Courses courses={courses} authors={authors} onEdit={this.onEdit} />
         <Modal animated visible={open}>
           <SafeAreaView style={{ flex: 1 }}>
             <TouchableWithoutFeedback onPress={this.toggleModal}>
