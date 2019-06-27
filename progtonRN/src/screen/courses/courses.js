@@ -30,9 +30,7 @@ class coursesPage extends PureComponent {
   };
 
   render() {
-    const { courses, onEdit, xyz } = this.props;
-
-    console.warn('xyz', xyz);
+    const { courses, onEdit } = this.props;
 
     return (
       <ScrollView>

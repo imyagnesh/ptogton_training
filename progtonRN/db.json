@@ -17,27 +17,19 @@
     },
     {
       "title": "New title",
-      "length": "3:05",
-      "category": "Training",
-      "watchHref": "www.google.com",
-      "authorId": "scott-allen",
-      "id": "2ElYM6D"
-    },
-    {
-      "title": "Title 1",
-      "length": "3:50",
+      "length": "3:11",
       "category": "React",
-      "watchHref": "Www.reactjs.org",
+      "watchHref": "Www.react.org",
       "authorId": "cory-house",
-      "id": "OfJ8Rjj"
+      "id": "jwopBdQ"
     },
     {
-      "title": "Title 2",
-      "length": "2:90",
-      "category": "React native",
-      "watchHref": "Www.reactnative.org",
-      "authorId": "scott-allen",
-      "id": "cfMR3Nk"
+      "title": "New title 1",
+      "length": "3:20",
+      "category": "React nativee",
+      "watchHref": "Www.react-native.org",
+      "authorId": "cory-house",
+      "id": "ziezXsf"
     }
   ],
   "authors": [

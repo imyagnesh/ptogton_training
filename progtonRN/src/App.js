@@ -1,15 +1,22 @@
 import React, { Component } from 'react';
-import { Button, SafeAreaView, Modal, TouchableWithoutFeedback, Text } from 'react-native';
-import { Provider } from 'react-redux';
+import PropTypes from 'prop-types';
+import {
+  Button,
+  SafeAreaView,
+  Modal,
+  TouchableWithoutFeedback,
+  Text,
+  ActivityIndicator,
+} from 'react-native';
+import { connect } from 'react-redux';
+
 import * as Yup from 'yup';
-import Config from 'react-native-config';
 import { TextBox, Select } from 'components';
 import Courses from './screen/courses/courses';
 import Close from './assets/icons/close.svg';
 import Form from './Form';
-import { API } from './utils';
 import { LocaleProvider } from './context/localeContext';
-import store from './configureStore';
+import * as types from './constants/actionTypes';
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required('Required'),
@@ -25,22 +32,46 @@ const initialValues = {
   watchHref: '',
   authorId: '',
 };
-export default class App extends Component {
+class App extends Component {
+  static propTypes = {
+    loadAuthors: PropTypes.func.isRequired,
+    loadCourses: PropTypes.func.isRequired,
+    courses: PropTypes.array.isRequired,
+    authors: PropTypes.array.isRequired,
+    authorsLoading: PropTypes.bool.isRequired,
+    coursesLoading: PropTypes.bool.isRequired,
+    authorsError: PropTypes.shape({
+      message: PropTypes.string.isRequired,
+    }),
+    coursesError: PropTypes.shape({
+      message: PropTypes.string.isRequired,
+    }),
+    updateCourse: PropTypes.func.isRequired,
+    saveCourse: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    authorsError: null,
+    coursesError: null,
+  };
+
   state = {
     open: false,
     form: initialValues,
-    courses: [],
-    authors: [],
-    error: false,
     formData: null,
     locale: 'en',
     changeLocale: val => this.changeLocale(val),
   };
 
-  async componentDidMount() {
-    await this.fetchData();
+  constructor(props) {
+    super(props);
+    const { loadAuthors, loadCourses } = props;
+    loadAuthors();
+    loadCourses();
+  }
 
-    const { authors } = this.state;
+  static getDerivedStateFromProps(nextProps, prevState) {
+    const { authors } = nextProps;
 
     const items = authors.map(x => ({ label: `${x.firstName} ${x.lastName}`, value: x.id }));
 
@@ -72,25 +103,14 @@ export default class App extends Component {
         placeholder: 'Select Author',
       },
     ];
-
-    this.setState({ formData });
+    return {
+      ...prevState,
+      formData,
+    };
   }
 
   changeLocale = val => {
-    console.warn(val);
     this.setState({ locale: val ? 'en' : 'es' });
-  };
-
-  fetchData = async () => {
-    try {
-      const res = await Promise.all([
-        API({ url: `${Config.API_URL}courses` }),
-        API({ url: `${Config.API_URL}authors` }),
-      ]);
-      this.setState({ courses: res[0], authors: res[1] });
-    } catch (error) {
-      this.setState({ error });
-    }
   };
 
   toggleModal = () => {
@@ -101,24 +121,12 @@ export default class App extends Component {
 
   onSubmit = async (values, actions) => {
     try {
-      let url = 'http://localhost:3004/courses';
       if (values.id) {
-        url = `http://localhost:3004/courses/${values.id}`;
-      }
-
-      const course = await API({ url, method: values.id ? 'PUT' : 'POST', body: values });
-      if (values.id) {
-        this.setState(state => {
-          const { courses } = this.state;
-          const index = courses.findIndex(x => x.id === values.id);
-          return {
-            courses: [...state.courses.slice(0, index), course, ...state.courses.slice(index + 1)],
-          };
-        });
+        const { updateCourse } = this.props;
+        updateCourse(values);
       } else {
-        this.setState(state => {
-          return { courses: [...state.courses, course] };
-        });
+        const { saveCourse } = this.props;
+        saveCourse(values);
       }
       this.toggleModal();
       actions.resetForm();
@@ -140,34 +148,70 @@ export default class App extends Component {
   };
 
   render() {
-    const { open, form, courses, authors, error, formData, locale, changeLocale } = this.state;
-    if (error) {
-      return <Text>{error.message}</Text>;
-    }
+    const { open, form, formData, locale, changeLocale } = this.state;
+    const {
+      courses,
+      authors,
+      authorsLoading,
+      coursesLoading,
+      authorsError,
+      coursesError,
+    } = this.props;
+
     return (
-      <Provider store={store}>
-        <LocaleProvider value={{ locale, changeLocale }}>
-          <SafeAreaView>
-            <Button title="Add Course" onPress={this.onAddCourse} />
+      <LocaleProvider value={{ locale, changeLocale }}>
+        <SafeAreaView>
+          {(authorsLoading || coursesLoading) && <ActivityIndicator animating size="large" />}
+          {!!authorsError && <Text>{authorsError.message}</Text>}
+          {!!coursesError && <Text>{coursesError.message}</Text>}
+          <Button title="Add Course" onPress={this.onAddCourse} />
+          {!!courses && !!authors && (
             <Courses courses={courses} authors={authors} onEdit={this.onEdit} />
-            <Modal animated visible={open}>
-              <SafeAreaView style={{ flex: 1 }}>
-                <TouchableWithoutFeedback onPress={this.toggleModal}>
-                  <Close width={24} height={24} />
-                </TouchableWithoutFeedback>
-                {formData && (
-                  <Form
-                    initialValues={form}
-                    onSubmit={this.onSubmit}
-                    validationSchema={validationSchema}
-                    formData={formData}
-                  />
-                )}
-              </SafeAreaView>
-            </Modal>
-          </SafeAreaView>
-        </LocaleProvider>
-      </Provider>
+          )}
+          <Modal animated visible={open} onDismiss={() => {}}>
+            <SafeAreaView style={{ flex: 1 }}>
+              <TouchableWithoutFeedback onPress={this.toggleModal}>
+                <Close width={24} height={24} />
+              </TouchableWithoutFeedback>
+              {formData && (
+                <Form
+                  initialValues={form}
+                  onSubmit={this.onSubmit}
+                  validationSchema={validationSchema}
+                  formData={formData}
+                />
+              )}
+            </SafeAreaView>
+          </Modal>
+        </SafeAreaView>
+      </LocaleProvider>
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    authorsLoading: !!state.loading[`${types.FETCH}_${types.AUTHORS}`],
+    coursesLoading: !!state.loading[`${types.FETCH}_${types.COURSES}`],
+    authorsError: state.error[`${types.FETCH}_${types.AUTHORS}`],
+    coursesError: state.error[`${types.FETCH}_${types.COURSES}`],
+    authors: state.authors,
+    courses: state.courses,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    loadAuthors: () => dispatch({ type: `${types.FETCH}_${types.AUTHORS}_${types.REQUEST}` }),
+    loadCourses: () => dispatch({ type: `${types.FETCH}_${types.COURSES}_${types.REQUEST}` }),
+    saveCourse: payload =>
+      dispatch({ type: `${types.SAVE}_${types.COURSES}_${types.REQUEST}`, payload }),
+    updateCourse: payload =>
+      dispatch({ type: `${types.UPDATE}_${types.COURSES}_${types.REQUEST}`, payload }),
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(App);
