@@ -3,6 +3,10 @@ package com.progtonrn;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.rnfs.RNFSPackage;
+import com.brentvatne.react.ReactVideoPackage;
+import org.reactnative.camera.RNCameraPackage;
+import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.horcrux.svg.SvgPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
@@ -26,6 +30,10 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNFSPackage(),
+            new ReactVideoPackage(),
+            new RNCameraPackage(),
+            new NetInfoPackage(),
             new RNGestureHandlerPackage(),
             new SvgPackage(),
             new ReactNativeConfigPackage()
